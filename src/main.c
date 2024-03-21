@@ -3,6 +3,6 @@
 
 int main(void)
 {
-    printf("%p\n", f_memset(NULL, 0, 5));
+    printf("Hello!\n");
     return 0;
 }

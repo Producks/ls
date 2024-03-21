@@ -2,7 +2,6 @@
 
 void *f_memset(void *s, int c, size_t n)
 {
-    return NULL;
 	register unsigned char	*ptr = (unsigned char*)s;
 
 	while (n-- > 0)

@@ -122,4 +122,6 @@ Temporary Items
 .history
 .ionide
 
+ft_ls
+
 # End of https://www.toptal.com/developers/gitignore/api/c,linux,visualstudiocode,macos
