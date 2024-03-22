@@ -12,7 +12,8 @@
 enum sort_type{
     normal,
     reverse,
-    time
+    time,
+    reverse_time
 };
 
 struct ls_params{

@@ -29,6 +29,7 @@ static int8_t fill_options(const char *str)
 {
     if (!*str) // edge case handling for empty -
         return add_argument("-");
+        
     return 0;
 }
 
