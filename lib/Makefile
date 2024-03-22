@@ -1,6 +1,6 @@
 NAME = ls_utils.a
 CC = gcc
-CFGLAGS = -Wall -Werror -Wextra
+CFGLAGS = -Wall -Werror -Wextra -pedantic -O2
 REMOVE = rm -f
 LIBC = ar rcs
 
@@ -13,7 +13,7 @@ PURPLE = \033[0;35m
 CYAN = \033[0;36m
 WHITE = \033[0;37m
 
-SRC =	f_memset.c
+SRC =	f_memset.c f_strlen.c f_write_fd.c f_strdup.c f_strncpy.c
 OBJS = $(SRC:.c=.o)
 
 $(NAME): $(OBJS)

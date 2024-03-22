@@ -1,8 +1,6 @@
-#include "../lib/ls_utils.h"
-#include <stdio.h>
+#include "ls.h"
 
-int main(void)
+int main(int argc, char **argv)
 {
-    printf("Hello!\n");
-    return 0;
+    return ls(argc, argv);
 }
