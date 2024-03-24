@@ -29,7 +29,8 @@
 
 void test_dir(void)
 {
-    DIR *result = opendir(".");
+    DIR *result = opendir("ls.c");
+    printf("%p\n", result);
     struct dirent *dp;
     printf("List of all files in current directory\n");
     while ((dp=readdir(result)) != NULL)
@@ -103,6 +104,6 @@ int main(int argc, char **argv)
         return 0;
     }
     test_dir();
-    stat_baby(argv[1]);
+    // stat_baby(argv[1]);
     return 0;
 }

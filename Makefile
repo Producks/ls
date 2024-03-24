@@ -14,7 +14,7 @@ CYAN = \033[0;36m
 WHITE = \033[0;37m
 MAGENTA = \e[95m
 
-SRC =	./src/main.c ./src/ls.c ./src/parser.c
+SRC =	./src/main.c ./src/ls.c ./src/parser.c ./src/traversal.c ./src/queue.c
 OBJS = ${SRC:.c=.o}
 
 all: lib $(EXECUTABLE)

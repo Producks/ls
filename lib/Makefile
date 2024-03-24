@@ -13,7 +13,7 @@ PURPLE = \033[0;35m
 CYAN = \033[0;36m
 WHITE = \033[0;37m
 
-SRC =	f_memset.c f_strlen.c f_write_fd.c f_strdup.c f_strncpy.c
+SRC =	f_memset.c f_strlen.c f_write_fd.c f_strdup.c f_strncpy.c f_strcpy.c
 OBJS = $(SRC:.c=.o)
 
 $(NAME): $(OBJS)

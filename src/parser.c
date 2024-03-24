@@ -3,17 +3,15 @@
 
 extern struct ls_params params;
 
-static inline int8_t fatal_error(void)
-{
-    perror("ls");
-    return FATAL_ERROR;
-}
-
 void clean_params(void)
 {
     for (uint64_t i = 0; i < params.argument_count; i++)
         free(params.arguments[i]);
-    free(params.arguments);
+    if (params.arguments != NULL){
+        free(params.arguments);
+        params.arguments = NULL;
+        params.argument_count = 0;
+    }
 }
 
 static int8_t add_argument(const char *str)
@@ -29,7 +27,28 @@ static int8_t fill_options(const char *str)
 {
     if (!*str) // edge case handling for empty -
         return add_argument("-");
-        
+    for (int index = 0; str[index]; index++){
+        switch(str[index]){
+            case ('a'):
+                params.show_hidden = true;
+                break;
+            case ('l'):
+                params.long_listing = true;
+                break;
+            case ('R'):
+                params.recursive = true;
+                break;
+            case ('r'):
+                params.reverse_sort = true;
+                break;
+            case ('t'):
+                params.time_sort = true;
+                break;
+            default:
+                printf("ls: invalid option -- '-%s'\n", str);
+                return FATAL_ERROR;
+        };
+    }
     return 0;
 }
 
