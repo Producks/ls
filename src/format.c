@@ -13,7 +13,7 @@ static void (*print)(const struct queue *q);
 static void print_regular(const struct queue *q)
 {
     for (uint16_t i = 0; i < q->count; i++)
-        printf("%s  ", q->q[i]->file_name);
+        printf("%d %s  ", q->q[i]->type, q->q[i]->file_name);
     printf("\n");
 }
 

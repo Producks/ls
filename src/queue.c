@@ -14,9 +14,6 @@ void clean_queue(struct queue *q)
 // Fixed size queue, won't need to grow larger
 int8_t add_to_queue(const char *str, const enum file_type type, int argc, struct queue *q)
 {
-    (void)type;
-    // if (*str == '.' && show_hidden == false) // Turn out I don't need to do that for fixed queue !
-    //     return SUCCESS;
     if (q->size == 0){
         q->q = malloc(sizeof(struct file_info *) * argc - 1);
         if (!q->q)
@@ -27,8 +24,10 @@ int8_t add_to_queue(const char *str, const enum file_type type, int argc, struct
     if (!file)
         return FATAL_ERROR;
     f_strcpy(file->file_name, str);
-    if (stat(str, &file->file_stat) == FATAL_ERROR)
-        return free(file), FATAL_ERROR;
+    if (type != symbolic_infinite)
+        if (stat(str, &file->file_stat) == FATAL_ERROR)
+            return perror("ls"), free(file), FATAL_ERROR;
     q->q[q->count++] = file;
+    file->type = type;
     return SUCCESS;
 }

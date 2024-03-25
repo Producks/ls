@@ -19,13 +19,26 @@
 #define NOT_FOUND -1
 #define SUCCESS 0
 
+
+//https://man7.org/linux/man-pages/man5/dir_colors.5.html
+//https://github.com/openbsd/src/blob/master/sys/sys/stat.h SO MANY OUTDATED RESOURCES ONLINE REEE
+
 enum file_type{
-    folder = 1,
-    file = 2,
-    symbolic = 3,
-    symbolic_folder = 4,
-    symbolic_file = 5,
-    invalid = -1
+    directory = 1,
+    file,
+    fifo,
+    blk,
+    chr,
+    socket,
+    symbolic,
+    symbolic_directory,
+    symbolic_file,
+    symbolic_fifo,
+    symbolic_blk,
+    symbolic_chr,
+    symbolic_socket,
+    symbolic_infinite,
+    invalid = -1,
 };
 
 struct ls_params{
@@ -40,6 +53,7 @@ struct ls_params{
 struct file_info{
     char file_name[256];
     struct stat file_stat;
+    enum file_type type;
 };
 
 struct queue{
