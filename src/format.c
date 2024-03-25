@@ -1,14 +1,42 @@
 #include "ls.h"
 
-static bool first = true;
+static void (*print)(const struct queue *q);
+// static bool first = true;
 
-// Should arrive here already sorted with the correct paramaters
-int8_t format_long_listing(struct file_queue *queue)
+
+// static void print_long_listing(const struct queue *q)
+// {
+//     (void)q;
+//     return;
+// }
+
+static void print_regular(const struct queue *q)
 {
-
+    for (uint16_t i = 0; i < q->count; i++)
+        printf("%s  ", q->q[i]->file_name);
+    printf("\n");
 }
 
-void print_f_q(void)
+// static void print_parent(const struct queue *q)
+// {
+//     if (first != true)
+//         printf("\n"); // gcc should optimze this to puts();
+//     printf("%s:\n", q->parent_name);
+//     for (uint16_t i = 0; i < q->count; i++)
+//         printf("%s  ", q->q[i]->file_name);
+//     printf("\n");
+// }
+
+void format(const struct queue *q)
 {
-    
+    if (q->count > 0)
+        print(q);
+}
+
+void set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q)
+{
+    (void)params;
+    (void)d_q;
+    (void)f_q;
+    print = print_regular;
 }

@@ -15,8 +15,8 @@ void clean_queue(struct queue *q)
 int8_t add_to_queue(const char *str, const enum file_type type, int argc, struct queue *q)
 {
     (void)type;
-    if (*str == '.' && show_hidden == false)
-        return SUCCESS;
+    // if (*str == '.' && show_hidden == false) // Turn out I don't need to do that for fixed queue !
+    //     return SUCCESS;
     if (q->size == 0){
         q->q = malloc(sizeof(struct file_info *) * argc - 1);
         if (!q->q)

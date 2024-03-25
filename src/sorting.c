@@ -9,21 +9,17 @@ static int8_t cmp_ascii(const struct file_info *s1, const struct file_info *s2)
 
 static int8_t cmp_reverse_ascii(const struct file_info *s1, const struct file_info *s2)
 {
-    return f_strcmp(s1->file_name, s2->file_name) > 0 ? -1 : 1;
+    return -f_strcmp(s1->file_name, s2->file_name);
 }
 
 static int8_t cmp_time(const struct file_info *s1, const struct file_info *s2)
 {
-    (void)s1;
-    (void)s2;
-    return 0;
+    return s1->file_stat.st_mtime < s2->file_stat.st_mtime ? 1 : -1;
 }
 
 static int8_t cmp_rev_time(const struct file_info *s1, const struct file_info *s2)
 {
-    (void)s1;
-    (void)s2;
-    return 0;
+    return s1->file_stat.st_mtime < s2->file_stat.st_mtime ? -1 : 1;
 }
 
 static void swap(struct queue *q, const int i, const int j)
@@ -33,19 +29,34 @@ static void swap(struct queue *q, const int i, const int j)
     q->q[j] = temp;
 }
 
-void bubble_sort_LOL(struct queue *q)
+// -1 == j < pivot
+//  1 == j > pivot
+uint32_t partition(struct queue *q, int low, int high)
 {
-    for (int i = 0; i < q->count; i++){
-        bool s = false;
-        for (int j = i + 1; j < q->count; j++){
-            if (cmp(q->q[i], q->q[j]) == 1){
-                swap(q, i, j);
-                s = true;
-            }
-        }
-        if (s == false)
-            break;
+    int pivot = high;
+    int i = low;
+    for (int j = low; j < high; j++){
+        if (cmp(q->q[j], q->q[pivot]) < 0)
+            swap(q, i++, j);
     }
+    swap(q, i, high);
+    return i;
+}
+
+void quicksort(struct queue *q, int low, int high)
+{
+    if (low < high){
+        int pivot_index = partition(q, low, high);
+        quicksort(q, low, pivot_index - 1);
+        quicksort(q, low + 1, high);
+    }
+}
+
+void sort(struct queue *q)
+{
+    if (q->count == 0)
+        return;
+    quicksort(q, 0, q->count - 1);
 }
 
 void set_cmp_func(struct ls_params *params)

@@ -15,6 +15,7 @@
 #include <errno.h>
 
 #define FATAL_ERROR -1
+#define EXIT_ERROR 1
 #define NOT_FOUND -1
 #define SUCCESS 0
 
@@ -37,7 +38,7 @@ struct ls_params{
 };
 
 struct file_info{
-    char file_name [256];
+    char file_name[256];
     struct stat file_stat;
 };
 
@@ -45,6 +46,7 @@ struct queue{
     uint16_t count;
     uint16_t size;
     struct file_info **q;
+    char parent_name[256];
 };
 
 struct tree{
@@ -68,6 +70,9 @@ void    clean_queue(struct queue *q);
 
 
 void    set_cmp_func(struct ls_params *params);
-void bubble_sort_LOL(struct queue *q);
+void    sort(struct queue *q);
+
+void    set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q);
+void    format(const struct queue *q);
 
 #endif

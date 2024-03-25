@@ -29,13 +29,15 @@ static enum file_type get_file_type(const char *str, int (*f)(const char *, stru
         return ret > 0 ? symbolic + ret : invalid;
     }
 not_found:
-    (void)printf("ls: cannot access '%s': %s\n", str, strerror(errno));
+    (void)printf("ls: cannot access '%s': %s\n", str, strerror(errno)); // RETURN SYMBOLIC INFINITE LOOP GARBAGE TODO
     return invalid;
 }
 
 static int8_t parse_args(const struct ls_params *params, struct queue *f_queue, struct queue *d_queue, const int argc)
 {
     int ret = SUCCESS;
+    if (params->argument_count == 0)
+        ret = add_to_queue(".", folder, argc, d_queue);
     for (uint64_t i = 0; i < params->argument_count; i++){
         enum file_type type = get_file_type(params->arguments[i], lstat);
         if (type == invalid)
@@ -53,18 +55,19 @@ static int8_t parse_args(const struct ls_params *params, struct queue *f_queue, 
 int ls(int argc, char **argv)
 {
     struct ls_params params = {false, false, false, false, 0, NULL};
-    struct queue f_queue = {0, 0, NULL};
-    struct queue d_queue = {0, 0, NULL};
+    struct queue f_queue = {0, 0, NULL, "\0"};
+    struct queue d_queue = {0, 0, NULL, "\0"};
 
     if (parse_params(&params, argc, argv))
-        return 1;
+        return EXIT_ERROR;
     if (parse_args(&params, &f_queue, &d_queue, argc))
-        return 1;
+        return EXIT_ERROR;
     set_cmp_func(&params);
-    bubble_sort_LOL(&d_queue);
-    for (int i = 0; i < d_queue.count; i++)
-        printf("%s\n", d_queue.q[i]->file_name);
-    // sort_args();
+    set_print_func(&params, &d_queue, &f_queue);
+    sort(&d_queue);
+    sort(&f_queue);
+    format(&f_queue);
+    format(&d_queue);
     cleanup(&params, &f_queue, &d_queue);
     return SUCCESS;
 }
