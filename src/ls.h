@@ -30,7 +30,6 @@ enum file_type{
 struct ls_params{
     bool long_listing; // -l use a long listing format
     bool recursive; // -R, --recursive list subdirectories recursively
-    bool show_hidden; // -a, --all do not ignore entries starting with .
     bool time_sort; // -t for time sort
     bool reverse_sort; // -r reverse sort
     uint64_t argument_count;
@@ -40,23 +39,35 @@ struct ls_params{
 struct file_info{
     char file_name [256];
     struct stat file_stat;
-    uint16_t ascii_size;
 };
 
-struct file_queue{
+struct queue{
     uint16_t count;
     uint16_t size;
     struct file_info **q;
 };
 
-int ls(int argc, char **argv);
-int8_t fatal_error(void);
+struct tree{
+    uint16_t child_count;
+    uint16_t childs_size;
+    struct tree *parent;
+    struct tree **childs;
+    struct queue *q;
+};
 
-int8_t parse_params(int argc, char**argv);
-void clean_params(void);
+int     ls(int argc, char **argv);
+int8_t  fatal_error(void);
 
-int8_t add_f_queue(const char *str, const enum file_type type);
-int8_t create_queue(const char *file, struct file_queue *queue);
-void clean_f_queue(void);
+
+int8_t  parse_params(struct ls_params *params, int argc, char**argv);
+void    clean_params(struct ls_params *params);
+
+
+int8_t  add_to_queue(const char *str, const enum file_type type, int argc, struct queue *q);
+void    clean_queue(struct queue *q);
+
+
+void    set_cmp_func(struct ls_params *params);
+void bubble_sort_LOL(struct queue *q);
 
 #endif

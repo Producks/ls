@@ -12,5 +12,6 @@ void f_write_fd(const char *str, int fd);
 char *f_strdup(const char *s);
 char *f_strncpy(char *dest, const char *src, size_t n);
 char *f_strcpy(char *dest, const char *src);
+int f_strcmp(const char *s1, const char *s2);
 
 #endif

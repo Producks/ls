@@ -1,9 +1,6 @@
 #include "ls.h"
 
-
-struct ls_params params = {false, false, false, false, false, 0, NULL};
-struct file_queue f_queue = {0, 0, NULL};
-// static uint32_t recursion_counter = 0;
+bool show_hidden = false;
 
 int8_t fatal_error(void)
 {
@@ -11,10 +8,11 @@ int8_t fatal_error(void)
     return FATAL_ERROR;
 }
 
-static void cleanup(void)
+static void cleanup(struct ls_params *params, struct queue *f_queue, struct queue *d_queue)
 {
-    clean_params();
-    clean_f_queue();
+    clean_params(params);
+    clean_queue(f_queue);
+    clean_queue(d_queue);
 }
 
 static enum file_type get_file_type(const char *str, int (*f)(const char *, struct stat *))
@@ -35,15 +33,17 @@ not_found:
     return invalid;
 }
 
-int8_t parse_args(void)
+static int8_t parse_args(const struct ls_params *params, struct queue *f_queue, struct queue *d_queue, const int argc)
 {
     int ret = SUCCESS;
-    for (uint64_t i = 0; i < params.argument_count; i++){
-        enum file_type type = get_file_type(params.arguments[i], lstat);
+    for (uint64_t i = 0; i < params->argument_count; i++){
+        enum file_type type = get_file_type(params->arguments[i], lstat);
         if (type == invalid)
             continue;
         else if (type == file || type == symbolic_file)
-            ret = add_f_queue(params.arguments[i], type);
+            ret = add_to_queue(params->arguments[i], type, argc, f_queue);
+        else if (type == folder || type == symbolic_folder)
+            ret = add_to_queue(params->arguments[i], type, argc, d_queue);
         if (ret == FATAL_ERROR)
             break;
     }
@@ -52,11 +52,19 @@ int8_t parse_args(void)
 
 int ls(int argc, char **argv)
 {
-    if (parse_params(argc, argv))
+    struct ls_params params = {false, false, false, false, 0, NULL};
+    struct queue f_queue = {0, 0, NULL};
+    struct queue d_queue = {0, 0, NULL};
+
+    if (parse_params(&params, argc, argv))
         return 1;
-    if (parse_args())
+    if (parse_args(&params, &f_queue, &d_queue, argc))
         return 1;
-    // print_f_q();
-    cleanup();
+    set_cmp_func(&params);
+    bubble_sort_LOL(&d_queue);
+    for (int i = 0; i < d_queue.count; i++)
+        printf("%s\n", d_queue.q[i]->file_name);
+    // sort_args();
+    cleanup(&params, &f_queue, &d_queue);
     return SUCCESS;
 }
