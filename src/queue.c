@@ -11,8 +11,13 @@ void clean_queue(struct queue *q)
     }
 }
 
+// int8_t add_to_dynamic_queue(const char *str, const enum file_type type, struct queue *q)
+// {
+
+// }
+
 // Fixed size queue, won't need to grow larger
-int8_t add_to_queue(const char *str, const enum file_type type, int argc, struct queue *q)
+int8_t add_to_fix_queue(const char *str, const enum file_type type, int argc, struct queue *q)
 {
     if (q->size == 0){
         q->q = malloc(sizeof(struct file_info *) * argc - 1);

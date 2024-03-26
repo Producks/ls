@@ -45,19 +45,40 @@ static int8_t parse_args(const struct ls_params *params, struct queue *f_queue, 
 {
     int ret = SUCCESS;
     if (params->argument_count == 0)
-        ret = add_to_queue(".", directory, argc, d_queue);
+        ret = add_to_fix_queue(".", directory, argc, d_queue);
     for (uint64_t i = 0; i < params->argument_count; i++){
         enum file_type type = get_file_type(params->arguments[i], lstat);
         if (type == invalid)
             continue;
         else if (type == directory || type == symbolic_directory)
-            ret = add_to_queue(params->arguments[i], type, argc, d_queue);
+            ret = add_to_fix_queue(params->arguments[i], type, argc, d_queue);
         else
-            ret = add_to_queue(params->arguments[i], type, argc, f_queue);
+            ret = add_to_fix_queue(params->arguments[i], type, argc, f_queue);
         if (ret == FATAL_ERROR)
             break;
     }
     return ret;
+}
+
+static void handle_folder(const char *directory)
+{
+    DIR *result = opendir(directory);
+}
+
+static void handle_recursive_folder(void)
+{
+    return;
+}
+
+static void magic(struct queue *f_queue, struct queue *d_queue, const bool recursive)
+{
+    format(f_queue);
+    for (int i = 0; i < d_queue->count; i++){
+        if (recursive == false)
+            handle_folder(d_queue->q[i]->file_name);
+        else
+            handle_recursive_folder();
+    }
 }
 
 int ls(int argc, char **argv)
@@ -74,8 +95,7 @@ int ls(int argc, char **argv)
     set_print_func(&params, &d_queue, &f_queue);
     sort(&d_queue);
     sort(&f_queue);
-    format(&f_queue);
-    format(&d_queue);
+    magic(&f_queue, &d_queue, params.recursive);
     cleanup(&params, &f_queue, &d_queue);
     return SUCCESS;
 }

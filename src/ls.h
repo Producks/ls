@@ -79,7 +79,7 @@ int8_t  parse_params(struct ls_params *params, int argc, char**argv);
 void    clean_params(struct ls_params *params);
 
 
-int8_t  add_to_queue(const char *str, const enum file_type type, int argc, struct queue *q);
+int8_t  add_to_fix_queue(const char *str, const enum file_type type, int argc, struct queue *q);
 void    clean_queue(struct queue *q);
 
 
