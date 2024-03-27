@@ -13,5 +13,6 @@ char *f_strdup(const char *s);
 char *f_strncpy(char *dest, const char *src, size_t n);
 char *f_strcpy(char *dest, const char *src);
 int f_strcmp(const char *s1, const char *s2);
+char *f_separator(const char *l, const char *r, const char c);
 
 #endif

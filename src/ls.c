@@ -1,7 +1,5 @@
 #include "ls.h"
 
-bool show_hidden = false;
-
 int8_t fatal_error(void)
 {
     perror("ls");
@@ -15,54 +13,45 @@ static void cleanup(struct ls_params *params, struct queue *f_queue, struct queu
     clean_queue(d_queue);
 }
 
-static enum file_type get_file_type(const char *str, int (*f)(const char *, struct stat *))
-{
-    struct stat file_info;
-    if (f(str, &file_info) == NOT_FOUND)
-        goto error;
-    if (S_ISREG(file_info.st_mode))
-        return file;
-    else if (S_ISDIR(file_info.st_mode))
-        return directory;
-    else if (S_ISLNK(file_info.st_mode)){
-        int ret = get_file_type(str, stat);
-        return ret > 0 ? symbolic + ret : symbolic_infinite;
-    }
-    else if (S_ISBLK(file_info.st_mode))
-        return blk;
-    else if (S_ISCHR(file_info.st_mode))
-        return chr;
-    else if (S_ISFIFO(file_info.st_mode))
-        return fifo;
-    else if (S_ISSOCK(file_info.st_mode))
-        return socket;
-error:
-    (void)printf("ls: cannot access '%s': %s\n", str, strerror(errno));
-    return invalid;
-}
-
 static int8_t parse_args(const struct ls_params *params, struct queue *f_queue, struct queue *d_queue, const int argc)
 {
     int ret = SUCCESS;
-    if (params->argument_count == 0)
-        ret = add_to_fix_queue(".", directory, argc, d_queue);
+    if (params->argument_count == 0){
+        struct file_info *info = create_file_info(".", ".");
+        if (!info)
+            return FATAL_ERROR;
+        ret = add_to_fix_queue(argc, d_queue, info);
+    }
     for (uint64_t i = 0; i < params->argument_count; i++){
-        enum file_type type = get_file_type(params->arguments[i], lstat);
-        if (type == invalid)
+        struct file_info *info = create_file_info(params->arguments[i], params->arguments[i]);
+        if (!info)
             continue;
-        else if (type == directory || type == symbolic_directory)
-            ret = add_to_fix_queue(params->arguments[i], type, argc, d_queue);
+        else if (info->type == directory || info->type == symbolic_directory)
+            ret = add_to_fix_queue(argc, d_queue, info);
         else
-            ret = add_to_fix_queue(params->arguments[i], type, argc, f_queue);
+            ret = add_to_fix_queue(argc, f_queue, info);
         if (ret == FATAL_ERROR)
             break;
     }
     return ret;
 }
 
-static void handle_folder(const char *directory)
+
+static void handle_folder(struct file_info *directory)
 {
-    DIR *result = opendir(directory);
+    struct queue *q = create_dynamic_queue(directory->file_name);
+    if (!q)
+        return;
+    if (directory->type == symbolic_directory){
+        char *real_folder = get_real_folder(directory->file_name);
+        fill_queue_from_directory(q, real_folder);
+        free(real_folder);
+    }
+    else
+        fill_queue_from_directory(q, directory->file_name);
+    sort(q);
+    format(q);
+    clean_dynamic_queue(&q);
 }
 
 static void handle_recursive_folder(void)
@@ -75,7 +64,7 @@ static void magic(struct queue *f_queue, struct queue *d_queue, const bool recur
     format(f_queue);
     for (int i = 0; i < d_queue->count; i++){
         if (recursive == false)
-            handle_folder(d_queue->q[i]->file_name);
+            handle_folder(d_queue->q[i]);
         else
             handle_recursive_folder();
     }
@@ -89,8 +78,10 @@ int ls(int argc, char **argv)
 
     if (parse_params(&params, argc, argv))
         return EXIT_ERROR;
-    if (parse_args(&params, &f_queue, &d_queue, argc))
+    if (parse_args(&params, &f_queue, &d_queue, argc)){
+        cleanup(&params, &f_queue, &d_queue);
         return EXIT_ERROR;
+    }
     set_cmp_func(&params);
     set_print_func(&params, &d_queue, &f_queue);
     sort(&d_queue);

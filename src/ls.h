@@ -13,6 +13,8 @@
 #include <dirent.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
+#include <linux/limits.h>
 
 #define FATAL_ERROR -1
 #define EXIT_ERROR 1
@@ -37,7 +39,7 @@ enum file_type{
     symbolic_blk,
     symbolic_chr,
     symbolic_socket,
-    symbolic_infinite,
+    broken_sym,
     invalid = -1,
 };
 
@@ -79,8 +81,12 @@ int8_t  parse_params(struct ls_params *params, int argc, char**argv);
 void    clean_params(struct ls_params *params);
 
 
-int8_t  add_to_fix_queue(const char *str, const enum file_type type, int argc, struct queue *q);
 void    clean_queue(struct queue *q);
+struct queue *create_dynamic_queue(const char *str);
+int8_t add_to_fix_queue(int argc, struct queue *q, struct file_info *add);
+void clean_dynamic_queue(struct queue **q);
+int8_t add_to_dynamic_queue(struct queue *q, const char *file_path, const char *file_name);
+void fill_queue_from_directory(struct queue *q, const char *directory);
 
 
 void    set_cmp_func(struct ls_params *params);
@@ -88,5 +94,9 @@ void    sort(struct queue *q);
 
 void    set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q);
 void    format(const struct queue *q);
+
+struct file_info *create_file_info(const char *file_path, const char *file_name);
+char *get_real_folder(const char *path);
+bool is_hidden(const char *str);
 
 #endif

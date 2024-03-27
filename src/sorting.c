@@ -29,8 +29,6 @@ static void swap(struct queue *q, const int i, const int j)
     q->q[j] = temp;
 }
 
-// -1 == j < pivot
-//  1 == j > pivot
 uint32_t partition(struct queue *q, int low, int high)
 {
     int pivot = high;
