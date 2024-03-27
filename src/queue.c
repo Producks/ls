@@ -68,7 +68,7 @@ void fill_queue_from_directory(struct queue *q, const char *directory)
     struct dirent *dp;
     (void)q;
     while ((dp=readdir(result)) != NULL){
-        if (is_hidden(dp->d_name))
+        if (is_hidden(dp->d_name) == true && show_hidden == false)
             continue;
         char *file_path = f_separator(directory, dp->d_name, '/');
         if (!file_path)
