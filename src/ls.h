@@ -123,5 +123,7 @@ void get_permission(const __mode_t mode, char *buffer);
 char get_type(const enum file_type type);
 char *get_owner(uid_t id);
 char *get_group(uid_t id);
+uint8_t num_digits (uint32_t n);
+void format_date(const time_t *date, char *buffer);
 
 #endif
