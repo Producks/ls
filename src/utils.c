@@ -19,6 +19,32 @@ static enum file_type check_type(__mode_t mode)
     return invalid;
 }
 
+char get_type(const enum file_type type)
+{
+    if (type == directory)
+        return 'd';
+    else
+        return '-';
+}
+
+void get_permission(const __mode_t mode, char *buffer)
+{
+    uint8_t index = 1;
+    buffer[index++] = OW_R(mode) ? 'r' : '-'; 
+    buffer[index++] = OW_W(mode) ? 'w' : '-'; 
+    buffer[index++] = OW_E(mode) ? 'x' : '-';
+
+    buffer[index++] = G_R(mode) ? 'r' : '-';
+    buffer[index++] = G_W(mode) ? 'w' : '-';
+    buffer[index++] = G_E(mode) ? 'x' : '-';
+
+    buffer[index++] = OT_R(mode) ? 'r' : '-';
+    buffer[index++] = OT_W(mode) ? 'w' : '-';
+    buffer[index++] = OT_E(mode) ? 'x' : '-';
+
+    buffer[index] = '\0';
+}
+
 static int8_t set_type(const char *str, struct file_info *file)
 {
     if (lstat(str, &file->file_stat) == FATAL_ERROR){
@@ -74,4 +100,19 @@ char *get_real_folder(const char *path)
 bool is_hidden(const char *str)
 {
     return *str == '.' ? true : false;
+}
+
+
+char *get_owner(uid_t id)
+{
+    struct passwd *result = getpwuid(id);
+    return result->pw_name;
+}
+
+char *get_group(uid_t id)
+{
+    struct group *result = getgrgid(id);
+    if (!result)
+        return NULL;
+    return result->gr_name;
 }

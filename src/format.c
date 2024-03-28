@@ -26,13 +26,17 @@ static void print_with_header_check(const struct queue *q)
 static void long_list(const struct queue *q)
 {
     uint32_t total = 0;
-    for (uint16_t i = 0; i < q->count; i++){
-        printf("%ld %ld %ld\n", q->q[i]->file_stat.st_size, q->q[i]->file_stat.st_blocks, q->q[i]->file_stat.st_blksize);
+    for (uint16_t i = 0; i < q->count; i++)
         total += q->q[i]->file_stat.st_blocks;
+    printf("total %d\n", total); // MAC WTF?
+    char permission[11];
+    char time_string[50];
+    for (uint16_t i = 0; i < q->count; i++){
+        permission[0] = get_type(q->q[i]->type);
+        get_permission(q->q[i]->file_stat.st_mode, permission);
+        printf("%s %3d %s  %s  %5lld %s %s\n", permission, q->q[i]->file_stat.st_nlink, get_owner(q->q[i]->file_stat.st_uid), get_group(q->q[i]->file_stat.st_gid), q->q[i]->file_stat.st_size, ctime(&q->q[i]->file_stat.st_mtime), q->q[i]->file_name);
     }
-    // printf("bytes%d\n", total);
-    printf("total %d\n", total / 2);
-    print_with_header_check(q);
+    // print_with_header_check(q);
 }
 
 //https://www.gnu.org/software/coreutils/manual/html_node/What-information-is-listed.html
