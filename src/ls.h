@@ -31,8 +31,9 @@
 #define EXIT_ERROR 1
 #define NOT_FOUND -1
 #define SUCCESS 0
-#define LINK_MAX_LENGTH 515 // 255 File max + 4 ( -> ) + 255 File max + 1 '\0'
+#define LINK_MAX_LENGTH NAME_MAX + 4 + NAME_MAX + 1
 #define SIX_MONTH 15780000 // approximation
+#define CHILD_PRE_ALLOCATE 10
 
 //https://man7.org/linux/man-pages/man5/dir_colors.5.html
 //https://github.com/openbsd/src/blob/master/sys/sys/stat.h SO MANY OUTDATED RESOURCES ONLINE REEE
@@ -69,16 +70,16 @@ enum file_type{
 };
 
 struct ls_params{
-    bool long_listing; // -l use a long listing format
-    bool recursive; // -R, --recursive list subdirectories recursively
-    bool time_sort; // -t for time sort
-    bool reverse_sort; // -r reverse sort
+    bool long_listing;
+    bool recursive;
+    bool time_sort;
+    bool reverse_sort;
     uint64_t argument_count;
     char **arguments;
 };
 
 struct file_info{
-    char file_name[256];
+    char file_name[NAME_MAX + 1];
     struct stat file_stat;
     enum file_type type;
 };
@@ -87,48 +88,42 @@ struct queue{
     uint16_t count;
     uint16_t size;
     struct file_info **q;
-    char parent_name[256];
+    char parent_name[NAME_MAX + 1];
+    char path[PATH_MAX + 1];
 };
 
-struct tree{
-    uint16_t child_count;
-    uint16_t childs_size;
-    struct tree *parent;
-    struct tree **childs;
-    struct queue *q;
-};
+int                 ls(int argc, char **argv);
+int8_t              fatal_error(void);
+void                handle_folder(struct file_info *directory);
 
-int     ls(int argc, char **argv);
-int8_t  fatal_error(void);
+int8_t              parse_params(struct ls_params *params, int argc, char**argv);
+void                clean_params(struct ls_params *params);
 
+void                clean_queue(struct queue *q);
+struct queue        *create_dynamic_queue(const char *str);
+int8_t              add_to_fix_queue(int argc, struct queue *q, struct file_info *add);
+void                clean_dynamic_queue(struct queue **q);
+int8_t              add_to_dynamic_queue(struct queue *q, const char *file_path, const char *file_name);
+void                fill_queue_from_directory(struct queue *q, const char *directory);
+// void                fill_queue_from_directory_recursive(struct queue *q, const char *directory);
 
-int8_t  parse_params(struct ls_params *params, int argc, char**argv);
-void    clean_params(struct ls_params *params);
+void                set_cmp_func(struct ls_params *params);
+void                sort(struct queue *q);
 
-void    clean_queue(struct queue *q);
-struct queue *create_dynamic_queue(const char *str);
-int8_t add_to_fix_queue(int argc, struct queue *q, struct file_info *add);
-void clean_dynamic_queue(struct queue **q);
-int8_t add_to_dynamic_queue(struct queue *q, const char *file_path, const char *file_name);
-void fill_queue_from_directory(struct queue *q, const char *directory);
+void                set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q);
+void                format(const struct queue *q);
 
-void    set_cmp_func(struct ls_params *params);
-void    sort(struct queue *q);
+struct file_info    *create_file_info(const char *file_path, const char *file_name);
+char                *get_real_folder(const char *path);
+bool                is_hidden(const char *str);
+void                get_permission(const __mode_t mode, char *buffer);
+char                get_type(const enum file_type type);
+char                *get_owner(uid_t id);
+char                *get_group(uid_t id);
+uint8_t             num_digits (uint32_t n);
+bool                six_month_passed(const time_t date);
+void                get_link(const char *file_name, char *buffer);
 
-void    set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q);
-void    format(const struct queue *q);
-
-struct file_info *create_file_info(const char *file_path, const char *file_name);
-char *get_real_folder(const char *path);
-bool is_hidden(const char *str);
-void get_permission(const __mode_t mode, char *buffer);
-char get_type(const enum file_type type);
-char *get_owner(uid_t id);
-char *get_group(uid_t id);
-uint8_t num_digits (uint32_t n);
-bool six_month_passed(const time_t date);
-void remove_new_line(char *str);
-void get_link(const char *file_name, char *buffer);
-
+void                traversal(struct file_info *dir, char *path);
 
 #endif

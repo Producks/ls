@@ -66,13 +66,35 @@ void fill_queue_from_directory(struct queue *q, const char *directory)
         return;
     }
     struct dirent *dp;
-    (void)q;
     while ((dp=readdir(result)) != NULL){
         if (is_hidden(dp->d_name) == true && show_hidden == false)
             continue;
         char *file_path = f_separator(directory, dp->d_name, '/');
         if (!file_path)
             break;
+        int ret = add_to_dynamic_queue(q, file_path, dp->d_name);
+        free(file_path);
+        if (ret == FATAL_ERROR)
+            break;
+    }
+    closedir(result);
+}
+
+void fill_queue_from_directory_recursive(struct queue *q, const char *directory)
+{
+    char *file_path = f_separator(q->parent_name, directory, '/');
+    DIR *result = opendir(directory);
+    if (!result){
+        (void)printf("ls: cannot open directory '%s': %s\n", directory, strerror(errno));
+        return;
+    }
+    struct dirent *dp;
+    while ((dp=readdir(result)) != NULL){
+        if (is_hidden(dp->d_name) == true && show_hidden == false)
+            continue;
+        // char *file_path = f_separator(directory, dp->d_name, '/');
+        // if (!file_path)
+        //     break;
         int ret = add_to_dynamic_queue(q, file_path, dp->d_name);
         free(file_path);
         if (ret == FATAL_ERROR)

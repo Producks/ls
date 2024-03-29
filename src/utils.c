@@ -143,15 +143,9 @@ bool six_month_passed(const time_t date)
 
     if (timestamp == 0)
         timestamp = time(NULL);
-    if (timestamp - date > SIX_MONTH)
+    if (timestamp - date > SIX_MONTH || date - timestamp < -SIX_MONTH)
         return true;
     return false;
-}
-
-void remove_new_line(char *str)
-{
-    const size_t index = f_strlen(str);
-    str[index - 2] = '\0';
 }
 
 void get_link(const char *file_name, char *buffer)

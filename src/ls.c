@@ -37,7 +37,7 @@ static int8_t parse_args(const struct ls_params *params, struct queue *f_queue, 
 }
 
 
-static void handle_folder(struct file_info *directory)
+void handle_folder(struct file_info *directory)
 {
     struct queue *q = create_dynamic_queue(directory->file_name);
     if (!q)
@@ -54,11 +54,6 @@ static void handle_folder(struct file_info *directory)
     clean_dynamic_queue(&q);
 }
 
-static void handle_recursive_folder(void)
-{
-    return;
-}
-
 static void magic(struct queue *f_queue, struct queue *d_queue, const bool recursive)
 {
     format(f_queue);
@@ -66,15 +61,15 @@ static void magic(struct queue *f_queue, struct queue *d_queue, const bool recur
         if (recursive == false)
             handle_folder(d_queue->q[i]);
         else
-            handle_recursive_folder();
+            traversal(d_queue->q[i], NULL);
     }
 }
 
 int ls(int argc, char **argv)
 {
     struct ls_params params = {false, false, false, false, 0, NULL};
-    struct queue f_queue = {0, 0, NULL, "\0"};
-    struct queue d_queue = {0, 0, NULL, "\0"};
+    struct queue f_queue = {0, 0, NULL, "\0", "\0"};
+    struct queue d_queue = {0, 0, NULL, "\0", "\0"};
 
     if (parse_params(&params, argc, argv))
         return EXIT_ERROR;
