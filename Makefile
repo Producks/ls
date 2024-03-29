@@ -1,6 +1,6 @@
 EXECUTABLE = ft_ls
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -pedantic
+CFLAGS = -Wall -Werror -Wextra -pedantic -g
 REMOVE = rm -f
 LS_UTILS = lib/ls_utils.a
 

@@ -31,6 +31,8 @@
 #define EXIT_ERROR 1
 #define NOT_FOUND -1
 #define SUCCESS 0
+#define LINK_MAX_LENGTH 515 // 255 File max + 4 ( -> ) + 255 File max + 1 '\0'
+#define SIX_MONTH 15780000 // approximation
 
 //https://man7.org/linux/man-pages/man5/dir_colors.5.html
 //https://github.com/openbsd/src/blob/master/sys/sys/stat.h SO MANY OUTDATED RESOURCES ONLINE REEE
@@ -124,6 +126,9 @@ char get_type(const enum file_type type);
 char *get_owner(uid_t id);
 char *get_group(uid_t id);
 uint8_t num_digits (uint32_t n);
-void format_date(const time_t *date, char *buffer);
+bool six_month_passed(const time_t date);
+void remove_new_line(char *str);
+void get_link(const char *file_name, char *buffer);
+
 
 #endif

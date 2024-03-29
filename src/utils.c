@@ -21,10 +21,8 @@ static enum file_type check_type(__mode_t mode)
 
 char get_type(const enum file_type type)
 {
-    if (type == directory)
-        return 'd';
-    else
-        return '-';
+    static const char lookup_table_file[] = { '!', 'd', '-', 'p', 'b', 'c', 's', 'l', 'l', 'l', 'l', 'l', 'l', 'l', 'l'}; // added ! for padding since enum start at 1
+    return lookup_table_file[type];
 }
 
 void get_permission(const __mode_t mode, char *buffer)
@@ -78,7 +76,6 @@ struct file_info *create_file_info(const char *file_path, const char *file_name)
     return file;
 }
 
-
 char *get_real_folder(const char *path)
 {
     char buffer[PATH_MAX + 1];
@@ -96,16 +93,16 @@ char *get_real_folder(const char *path)
     return f_strdup(buffer);
 }
 
-
 bool is_hidden(const char *str)
 {
     return *str == '.' ? true : false;
 }
 
-
 char *get_owner(uid_t id)
 {
     struct passwd *result = getpwuid(id);
+    if (!result)
+        return NULL;
     return result->pw_name;
 }
 
@@ -140,14 +137,30 @@ uint8_t num_digits(uint32_t n)
     return 10;
 }
 
-void format_date(const time_t *date, char *buffer)
+bool six_month_passed(const time_t date)
 {
     static time_t timestamp = 0;
 
     if (timestamp == 0)
         timestamp = time(NULL);
-    char *xd = ctime(date);
-    (void)xd;
-    (void)date;
-    (void)buffer;
+    if (timestamp - date > SIX_MONTH)
+        return true;
+    return false;
+}
+
+void remove_new_line(char *str)
+{
+    const size_t index = f_strlen(str);
+    str[index - 2] = '\0';
+}
+
+void get_link(const char *file_name, char *buffer)
+{
+    uint16_t index = 0;
+    for (; file_name[index]; index++)
+        buffer[index] = file_name[index];
+    f_strcpy(buffer + index, " -> ");
+    index += 4;
+    const ssize_t result = readlink(file_name, buffer + index, 255);
+    buffer[index + result] = '\0';
 }
