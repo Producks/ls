@@ -4,12 +4,14 @@ static void (*print)(const struct queue *q);
 static bool first = true;
 static bool header = false;
 static bool recursive = false;
+static bool skip_first_header = false;
 
 static inline void print_header(const struct queue *q)
 {
     if (first == true){
         first = false;
-        return;
+        if (skip_first_header == true)
+            return;
     }
     else
         printf("\n"); // Should be optimize to puts with O2 (hopefully)
@@ -61,7 +63,10 @@ static void long_list(const struct queue *q)
             printf("%.12s ", ctime(&q->q[i]->file_stat.st_mtime) + 4);
         if (q->q[i]->type >= symbolic){
             char link_buffer[LINK_MAX_LENGTH];
-            get_link(q->parent_name, q->q[i]->file_name, link_buffer);
+            if (recursive)
+                get_link(q->path, q->q[i]->file_name, link_buffer);
+            else
+                get_link(q->parent_name, q->q[i]->file_name, link_buffer);
             printf("%s\n", link_buffer);
         }
         else
@@ -122,14 +127,15 @@ void format(const struct queue *q)
 
 void set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q)
 {
-    (void)d_q;
-    (void)f_q;
-    // if (d_q->count + f_q->count > 1)
-    header = true;
-    // if (params->recursive == true){
-    //     header = true;
-    //     recursive = true;
-    // }
+    if (d_q->count + f_q->count > 1){
+        header = true;
+        if (d_q->count > 0)
+            skip_first_header = true;
+    }
+    if (params->recursive == true){
+        header = true;
+        recursive = true;
+    }
     if (params->long_listing == true)
         print = long_list;
     else
