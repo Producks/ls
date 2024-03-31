@@ -34,6 +34,7 @@
 #define LINK_MAX_LENGTH NAME_MAX + 4 + NAME_MAX + 1
 #define SIX_MONTH 15780000 // approximation
 #define CHILD_PRE_ALLOCATE 10
+#define DYNAMIC_QUEUE_PRE_ALLOC 30
 
 //https://man7.org/linux/man-pages/man5/dir_colors.5.html
 //https://github.com/openbsd/src/blob/master/sys/sys/stat.h SO MANY OUTDATED RESOURCES ONLINE REEE
@@ -105,7 +106,8 @@ int8_t              add_to_fix_queue(int argc, struct queue *q, struct file_info
 void                clean_dynamic_queue(struct queue **q);
 int8_t              add_to_dynamic_queue(struct queue *q, const char *file_path, const char *file_name);
 void                fill_queue_from_directory(struct queue *q, const char *directory);
-// void                fill_queue_from_directory_recursive(struct queue *q, const char *directory);
+void                fill_queue_from_directory_recursive(struct queue *q, const char *directory);
+struct queue        *create_dynamic_queue_recursive(const char *path, const char *file);
 
 void                set_cmp_func(struct ls_params *params);
 void                sort(struct queue *q);
@@ -122,8 +124,9 @@ char                *get_owner(uid_t id);
 char                *get_group(uid_t id);
 uint8_t             num_digits (uint32_t n);
 bool                six_month_passed(const time_t date);
-void                get_link(const char *file_name, char *buffer);
+void                get_link(const char *path, const char *file_name, char *buffer);
+bool                forbidden_hidden(const char *str);
 
-void                traversal(struct file_info *dir, char *path);
+void                traversal(const struct file_info *dir, const char *path);
 
 #endif

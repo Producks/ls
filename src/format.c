@@ -3,16 +3,20 @@
 static void (*print)(const struct queue *q);
 static bool first = true;
 static bool header = false;
+static bool recursive = false;
 
 static inline void print_header(const struct queue *q)
 {
-    if (header == false)
-        return;
-    if (first == true)
+    if (first == true){
         first = false;
+        return;
+    }
     else
         printf("\n"); // Should be optimize to puts with O2 (hopefully)
-    printf("%s:\n", q->path);
+    if (recursive)
+        printf("%s:\n", q->path);
+    else
+        printf("%s:\n", q->parent_name);
 }
 
 static void print_regular(const struct queue *q)
@@ -47,7 +51,7 @@ static void long_list(const struct queue *q)
         permission[0] = get_type(q->q[i]->type);
         get_permission(q->q[i]->file_stat.st_mode, permission);
         six_month_passed(q->q[i]->file_stat.st_mtime);
-        printf("%s  %*lu %s  %s  %*ld ", permission, max_link, q->q[i]->file_stat.st_nlink, get_owner(q->q[i]->file_stat.st_uid), get_group(q->q[i]->file_stat.st_gid), max_size, q->q[i]->file_stat.st_size);
+        printf("%s %*lu %s %s %*ld ", permission, max_link, q->q[i]->file_stat.st_nlink, get_owner(q->q[i]->file_stat.st_uid), get_group(q->q[i]->file_stat.st_gid), max_size, q->q[i]->file_stat.st_size);
         if (six_month_passed(q->q[i]->file_stat.st_mtime)){
             char *time_str = ctime(&q->q[i]->file_stat.st_mtime);
             time_str[f_strlen(time_str) - 1] = '\0'; // Need to remove '\n; since ctime return one...
@@ -57,7 +61,7 @@ static void long_list(const struct queue *q)
             printf("%.12s ", ctime(&q->q[i]->file_stat.st_mtime) + 4);
         if (q->q[i]->type >= symbolic){
             char link_buffer[LINK_MAX_LENGTH];
-            get_link(q->q[i]->file_name, link_buffer);
+            get_link(q->parent_name, q->q[i]->file_name, link_buffer);
             printf("%s\n", link_buffer);
         }
         else
@@ -122,6 +126,10 @@ void set_print_func(const struct ls_params *params, const struct queue *d_q, con
     (void)f_q;
     // if (d_q->count + f_q->count > 1)
     header = true;
+    // if (params->recursive == true){
+    //     header = true;
+    //     recursive = true;
+    // }
     if (params->long_listing == true)
         print = long_list;
     else

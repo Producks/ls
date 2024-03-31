@@ -52,9 +52,20 @@ void quicksort(struct queue *q, int low, int high)
 
 void sort(struct queue *q)
 {
-    if (q->count == 0)
-        return;
-    quicksort(q, 0, q->count - 1);
+    // if (q->count == 0)
+    //     return;
+    // quicksort(q, 0, q->count - 1);
+    for (int i = 0; i < q->count; i++){
+        bool s = false;
+        for (int j = i + 1; j < q->count; j++){
+            if (cmp(q->q[i], q->q[j]) == 1){
+                swap(q, i, j);
+                s = true;
+            }
+        }
+        if (s == false)
+            break;
+    }
 }
 
 void set_cmp_func(struct ls_params *params)
