@@ -35,6 +35,7 @@
 #define SIX_MONTH 15780000 // approximation
 #define CHILD_PRE_ALLOCATE 10
 #define DYNAMIC_QUEUE_PRE_ALLOC 30
+#define CUTOFF 10
 
 //https://man7.org/linux/man-pages/man5/dir_colors.5.html
 //https://github.com/openbsd/src/blob/master/sys/sys/stat.h SO MANY OUTDATED RESOURCES ONLINE REEE

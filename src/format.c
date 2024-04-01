@@ -6,8 +6,10 @@ static bool header = false;
 static bool recursive = false;
 static bool skip_first_header = false;
 
-static inline void print_header(const struct queue *q)
+static void print_header(const struct queue *q)
 {
+    if (header == false)
+        return;
     if (first == true){
         first = false;
         if (skip_first_header == true)

@@ -29,43 +29,25 @@ static void swap(struct queue *q, const int i, const int j)
     q->q[j] = temp;
 }
 
-uint32_t partition(struct queue *q, int low, int high)
+// https://www.youtube.com/watch?v=yCxV0kBpA6M&t=1122s
+static void insertion_sort(struct queue *q)
 {
-    int pivot = high;
-    int i = low;
-    for (int j = low; j < high; j++){
-        if (cmp(q->q[j], q->q[pivot]) < 0)
-            swap(q, i++, j);
-    }
-    swap(q, i, high);
-    return i;
-}
-
-void quicksort(struct queue *q, int low, int high)
-{
-    if (low < high){
-        int pivot_index = partition(q, low, high);
-        quicksort(q, low, pivot_index - 1);
-        quicksort(q, low + 1, high);
+    for (int i = 1; i < q->count; i++){
+        struct file_info *tmp = q->q[i];
+        int j = i - 1;
+        while (j >= 0 && cmp(q->q[j], tmp) > 0){
+            q->q[j + 1] = q->q[j];
+            j--;
+        }
+        q->q[j + 1] = tmp;
     }
 }
 
 void sort(struct queue *q)
 {
-    // if (q->count == 0)
-    //     return;
-    // quicksort(q, 0, q->count - 1);
-    for (int i = 0; i < q->count; i++){
-        bool s = false;
-        for (int j = i + 1; j < q->count; j++){
-            if (cmp(q->q[i], q->q[j]) == 1){
-                swap(q, i, j);
-                s = true;
-            }
-        }
-        if (s == false)
-            break;
-    }
+    if (q->count == 0)
+        return;
+    insertion_sort(q);
 }
 
 void set_cmp_func(struct ls_params *params)
