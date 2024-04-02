@@ -2,27 +2,48 @@
 
 static void (*print)(const struct queue *q);
 static void (*print_header)(const struct queue *q);
-static bool first = true;
 static bool recursive = false;
+
+static void print_dir_header_recursive(const struct queue *q)
+{
+    printf("\n"); // Should be optimized to put in O2
+    printf("%s:\n", q->path);
+}
 
 static void print_dir_header(const struct queue *q)
 {
-    if (first == true)
-        first = false;
-    else
-        printf("\n");
-    if (recursive)
+    printf("\n");
+    printf("%s:\n", q->parent_name);
+}
+
+static void print_first_header(const struct queue *q)
+{
+    if (recursive){
         printf("%s:\n", q->path);
-    else
+        print_header = print_dir_header_recursive;
+    }
+    else{
         printf("%s:\n", q->parent_name);
+        print_header = print_dir_header;
+    }
 }
 
 static void print_not_first_header(const struct queue *q)
 {
     (void)q;
-    first = false;
-    print_header = print_dir_header;
+    if (recursive)
+        print_header = print_dir_header_recursive;
+    else
+        print_header = print_dir_header;
 }
+
+
+// static void print_file(const struct file_info *file)
+// {
+//     static const char *color_table[] = { "", "\x1b[34m", "\x1b[0m", "40;33", "40;33;01", "40;33;01", "01;35", "\x1b[36m", "\x1b[36m", "\x1b[36m", "\x1b[36m", "\x1b[36m", "\x1b[36m", "\x1b[36m", "\x1b[31m"};
+//     if (colors)
+//         printf("%s%s%s ", color_table[file->type], file->file_name, "\x1b[0m");
+// }
 
 static void print_no_header(const struct queue *q)
 {
@@ -75,7 +96,7 @@ static void long_list(const struct queue *q)
                 get_link(q->path, q->q[i]->file_name, link_buffer);
             else
                 get_link(q->parent_name, q->q[i]->file_name, link_buffer);
-            printf("%s\n", link_buffer);
+            printf("%s -> %s\n", q->q[i]->file_name, link_buffer);
         }
         else
             printf("%s\n", q->q[i]->file_name);
@@ -140,17 +161,17 @@ void set_print_func(const struct ls_params *params, const struct queue *d_q, con
         if (d_q->count == 0)
             print_header = print_no_header;
         else if (f_q->count == 0)
-            print_header = print_dir_header;
+            print_header = print_first_header;
         else
             print_header = print_not_first_header;
     }
     else{
         if (d_q->count == 0)
             print_header = print_no_header;
-        else if (d_q->count == 1 && ((argc - 1) - d_q->count == 0))
+        else if (d_q->count == 1 && ((argc - 1) - d_q->count <= 0))
             print_header = print_no_header;
         else if (f_q->count == 0)
-            print_header = print_dir_header;
+            print_header = print_first_header;
         else
             print_header = print_not_first_header;
     }

@@ -148,18 +148,18 @@ bool six_month_passed(const time_t date)
     return false;
 }
 
-// Optimize TODO
 void get_link(const char *path, const char *file_name, char *buffer)
 {
-    uint16_t index = 0;
-    for (; file_name[index]; index++)
-        buffer[index] = file_name[index];
-    f_strcpy(buffer + index, " -> ");
-    index += 4;
-    char *test = f_separator(path, file_name , '/');
-    const ssize_t result = readlink(test, buffer + index, 255);
-    buffer[index + result] = '\0';
-    free(test);
+    char *file_path = f_separator(path, file_name , '/');
+    const int32_t result = readlink(file_path, buffer, NAME_MAX);
+    if (result == FATAL_ERROR){
+        free(file_path);
+        perror("ls");
+        buffer[0] = '\0';
+        return;
+    }
+    buffer[result] = '\0';
+    free(file_path);
 }
 
 bool forbidden_hidden(const char *str)
