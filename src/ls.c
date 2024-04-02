@@ -71,14 +71,16 @@ int ls(int argc, char **argv)
     struct queue f_queue = {0, 0, NULL, "\0", "\0"};
     struct queue d_queue = {0, 0, NULL, "\0", "\0"};
 
-    if (parse_params(&params, argc, argv))
+    if (parse_params(&params, argc, argv)){
+        clean_params(&params);
         return EXIT_ERROR;
+    }
     if (parse_args(&params, &f_queue, &d_queue, argc)){
         cleanup(&params, &f_queue, &d_queue);
         return EXIT_ERROR;
     }
     set_cmp_func(&params);
-    set_print_func(&params, &d_queue, &f_queue);
+    set_print_func(&params, &d_queue, &f_queue, argc);
     sort(&d_queue);
     sort(&f_queue);
     magic(&f_queue, &d_queue, params.recursive);

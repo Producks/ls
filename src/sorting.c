@@ -22,14 +22,6 @@ static int8_t cmp_rev_time(const struct file_info *s1, const struct file_info *s
     return s1->file_stat.st_mtime < s2->file_stat.st_mtime ? -1 : 1;
 }
 
-static void swap(struct queue *q, const int i, const int j)
-{
-    struct file_info *temp = q->q[i];
-    q->q[i] = q->q[j];
-    q->q[j] = temp;
-}
-
-// https://www.youtube.com/watch?v=yCxV0kBpA6M&t=1122s
 static void insertion_sort(struct queue *q)
 {
     for (int i = 1; i < q->count; i++){

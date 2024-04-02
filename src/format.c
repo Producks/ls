@@ -1,26 +1,32 @@
 #include "ls.h"
 
 static void (*print)(const struct queue *q);
+static void (*print_header)(const struct queue *q);
 static bool first = true;
-static bool header = false;
 static bool recursive = false;
-static bool skip_first_header = false;
 
-static void print_header(const struct queue *q)
+static void print_dir_header(const struct queue *q)
 {
-    if (header == false)
-        return;
-    if (first == true){
+    if (first == true)
         first = false;
-        if (skip_first_header == true)
-            return;
-    }
     else
-        printf("\n"); // Should be optimize to puts with O2 (hopefully)
+        printf("\n");
     if (recursive)
         printf("%s:\n", q->path);
     else
         printf("%s:\n", q->parent_name);
+}
+
+static void print_not_first_header(const struct queue *q)
+{
+    (void)q;
+    first = false;
+    print_header = print_dir_header;
+}
+
+static void print_no_header(const struct queue *q)
+{
+    (void)q;
 }
 
 static void print_regular(const struct queue *q)
@@ -127,16 +133,26 @@ void format(const struct queue *q)
         print(q);
 }
 
-void set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q)
+void set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q, const int argc)
 {
-    if (d_q->count + f_q->count > 1){
-        header = true;
-        if (d_q->count > 0)
-            skip_first_header = true;
-    }
     if (params->recursive == true){
-        header = true;
         recursive = true;
+        if (d_q->count == 0)
+            print_header = print_no_header;
+        else if (f_q->count == 0)
+            print_header = print_dir_header;
+        else
+            print_header = print_not_first_header;
+    }
+    else{
+        if (d_q->count == 0)
+            print_header = print_no_header;
+        else if (d_q->count == 1 && ((argc - 1) - d_q->count == 0))
+            print_header = print_no_header;
+        else if (f_q->count == 0)
+            print_header = print_dir_header;
+        else
+            print_header = print_not_first_header;
     }
     if (params->long_listing == true)
         print = long_list;

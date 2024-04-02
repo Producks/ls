@@ -148,6 +148,7 @@ bool six_month_passed(const time_t date)
     return false;
 }
 
+// Optimize TODO
 void get_link(const char *path, const char *file_name, char *buffer)
 {
     uint16_t index = 0;

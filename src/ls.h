@@ -40,17 +40,17 @@
 //https://man7.org/linux/man-pages/man5/dir_colors.5.html
 //https://github.com/openbsd/src/blob/master/sys/sys/stat.h SO MANY OUTDATED RESOURCES ONLINE REEE
 
-#define OW_R(m)      ((m) & S_IRUSR)    /* Read permission, owner. */
+#define OW_R(m)      ((m) & S_IRUSR)     /* Read permission, owner. */
 #define OW_W(m)      ((m) &  S_IWUSR)    /* Write permission, owner. */
 #define OW_E(m)      ((m) &  S_IXUSR)    /* Execute/search permission, owner. */
 
-#define G_R(m)       ((m) & S_IRGRP)    /* Read permission, group. */
-#define G_W(m)       ((m) & S_IWGRP)    /* Write permission, group. */
-#define G_E(m)       ((m) & S_IXGRP)    /* Execute/search permission, group. */
+#define G_R(m)       ((m) & S_IRGRP)     /* Read permission, group. */
+#define G_W(m)       ((m) & S_IWGRP)     /* Write permission, group. */
+#define G_E(m)       ((m) & S_IXGRP)     /* Execute/search permission, group. */
 
-#define OT_R(m)      ((m) & S_IROTH)    /* Read permission, others. */
-#define OT_W(m)      ((m) & S_IWOTH)    /* Write permission, others. */
-#define OT_E(m)      ((m) & S_IXOTH)    /* Execute/search permission, others. */
+#define OT_R(m)      ((m) & S_IROTH)     /* Read permission, others. */
+#define OT_W(m)      ((m) & S_IWOTH)     /* Write permission, others. */
+#define OT_E(m)      ((m) & S_IXOTH)     /* Execute/search permission, others. */
 
 
 enum file_type{
@@ -113,7 +113,7 @@ struct queue        *create_dynamic_queue_recursive(const char *path, const char
 void                set_cmp_func(struct ls_params *params);
 void                sort(struct queue *q);
 
-void                set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q);
+void                set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q, const int argc);
 void                format(const struct queue *q);
 
 struct file_info    *create_file_info(const char *file_path, const char *file_name);
