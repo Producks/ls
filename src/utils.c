@@ -168,3 +168,22 @@ bool forbidden_hidden(const char *str)
         return true;
     return false;
 }
+
+void sanitize_input(struct file_info *file)
+{
+    uint32_t index = 0;
+    uint32_t new_index = 0;
+    while (file->file_name[index])
+    {
+        if (file->file_name[index] == '/'){
+            file->file_name[new_index++] = file->file_name[index++];
+            while (file->file_name[index] == '/')
+                index++;
+        }
+        else
+            file->file_name[new_index++] = file->file_name[index++];
+    }
+    while (file->file_name[new_index - 1] == '/' && file->file_name[new_index - 1])
+        file->file_name[new_index--] = '\0';
+    file->file_name[new_index] = '\0';
+}

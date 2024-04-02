@@ -81,7 +81,7 @@ struct ls_params{
 };
 
 struct file_info{
-    char file_name[NAME_MAX + 1];
+    char file_name[PATH_MAX + 1];
     struct stat file_stat;
     enum file_type type;
 };
@@ -113,7 +113,7 @@ struct queue        *create_dynamic_queue_recursive(const char *path, const char
 void                set_cmp_func(struct ls_params *params);
 void                sort(struct queue *q);
 
-void                set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q, const int argc);
+void                set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q);
 void                format(const struct queue *q);
 
 struct file_info    *create_file_info(const char *file_path, const char *file_name);
@@ -127,6 +127,7 @@ uint8_t             num_digits (uint32_t n);
 bool                six_month_passed(const time_t date);
 void                get_link(const char *path, const char *file_name, char *buffer);
 bool                forbidden_hidden(const char *str);
+void                sanitize_input(struct file_info *file);
 
 void                traversal(const struct file_info *dir, const char *path);
 

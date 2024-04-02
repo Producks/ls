@@ -154,7 +154,7 @@ void format(const struct queue *q)
         print(q);
 }
 
-void set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q, const int argc)
+void set_print_func(const struct ls_params *params, const struct queue *d_q, const struct queue *f_q)
 {
     if (params->recursive == true){
         recursive = true;
@@ -168,7 +168,7 @@ void set_print_func(const struct ls_params *params, const struct queue *d_q, con
     else{
         if (d_q->count == 0)
             print_header = print_no_header;
-        else if (d_q->count == 1 && ((argc - 1) - d_q->count <= 0))
+        else if (f_q->count == 0 && d_q->count == 1)
             print_header = print_no_header;
         else if (f_q->count == 0)
             print_header = print_first_header;

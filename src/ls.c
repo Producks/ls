@@ -26,8 +26,10 @@ static int8_t parse_args(const struct ls_params *params, struct queue *f_queue, 
         struct file_info *info = create_file_info(params->arguments[i], params->arguments[i]);
         if (!info)
             continue;
-        else if (info->type == directory || info->type == symbolic_directory)
+        else if (info->type == directory || info->type == symbolic_directory){
+            sanitize_input(info);
             ret = add_to_fix_queue(argc, d_queue, info);
+        }
         else
             ret = add_to_fix_queue(argc, f_queue, info);
         if (ret == FATAL_ERROR)
@@ -80,7 +82,7 @@ int ls(int argc, char **argv)
         return EXIT_ERROR;
     }
     set_cmp_func(&params);
-    set_print_func(&params, &d_queue, &f_queue, argc);
+    set_print_func(&params, &d_queue, &f_queue);
     sort(&d_queue);
     sort(&f_queue);
     magic(&f_queue, &d_queue, params.recursive);
