@@ -183,7 +183,7 @@ void sanitize_input(struct file_info *file)
         else
             file->file_name[new_index++] = file->file_name[index++];
     }
-    while (file->file_name[new_index - 1] == '/' && file->file_name[new_index - 1])
+    while (new_index - 1 != 0 && file->file_name[new_index - 1] == '/')
         file->file_name[new_index--] = '\0';
     file->file_name[new_index] = '\0';
 }
